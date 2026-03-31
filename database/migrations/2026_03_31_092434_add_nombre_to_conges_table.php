@@ -9,20 +9,19 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+    public function up()
     {
         Schema::table('conges', function (Blueprint $table) {
-            $table->integer('solde_restant')->nullable();
+            $table->integer('nombre')->after('statut');
         });
     }
-
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
         Schema::table('conges', function (Blueprint $table) {
-            $table->dropColumn('solde_restant');
+            //
         });
     }
 };

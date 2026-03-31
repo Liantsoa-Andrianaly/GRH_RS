@@ -86,9 +86,7 @@ Route::get('/pointages/suivi', [PointageController::class, 'suiviPresence'])->na
     Route::get('/solde-conges', [CongeController::class, 'soldeTous'])->name('conges.solde');
     Route::get('/conges/{id}/pdf', [CongeController::class, 'telechargerPDF'])->name('conges.pdf');
     Route::get('/mes-conges', [CongeController::class, 'mesConges'])->name('conges.mes_conges');
-Route::get('/conges/valider/{conge}', [EmployeeController::class, 'validerConge'])->name('conges.valider');
-
-
+    Route::post('/conges/valider/{id}', [CongeController::class, 'valider'])->name('conges.valider');
 
 Route::get('conges/{id}/pdf', [CongeController::class, 'telechargerPDF'])
     ->name('conges.pdf')
@@ -109,4 +107,3 @@ Route::get('/backups/create', [BackupController::class, 'create'])->name('backup
 Route::resource('types_prelevements', TypePrelevementController::class);
 
 require __DIR__.'/auth.php';
-

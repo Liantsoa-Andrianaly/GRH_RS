@@ -3,7 +3,7 @@
 
     <!-- Logo -->
     <div class="text-center my-3">
-        <img src="{{ asset('/img/service.png') }}" alt="Logo" style="width: 150px; height:150px;">
+        <img src="{{ asset('/img/service.png') }}" alt="Logo" style="width: 100px; height:100px;">
     </div>
     <hr class="sidebar-divider my-0">
 

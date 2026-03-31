@@ -7,7 +7,7 @@ use App\Models\Employee;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-use PDF;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class CongeController extends Controller
 {
@@ -74,34 +74,40 @@ class CongeController extends Controller
     /**
      * Validation RH (SEUL ENDROIT OÙ LE SOLDE CHANGE)
      */
-    public function valider($id)
-    {
-        $conge = Conge::with('employee')->findOrFail($id);
+public function valider($id)
+{
+    $conge = Conge::with('employee')->findOrFail($id);
 
-        if ($conge->statut !== 'en_attente') {
-            return back()->with('error', 'Ce congé est déjà traité.');
+    // Vérifie que le congé est en attente
+    if ($conge->statut !== 'en_attente') {
+        return back()->with('error', 'Ce congé est déjà traité.');
+    }
+
+    DB::transaction(function () use ($conge) {
+
+        $employee = $conge->employee;
+
+        // Vérifie si l'employé a assez de solde
+        if ($employee->solde_conge < $conge->nombre) {
+            throw new \Exception('Solde insuffisant');
         }
 
-        DB::transaction(function () use ($conge) {
+        // 🔹 CALCUL DU NOUVEAU SOLDE
+        $newSolde = $employee->solde_conge - $conge->nombre;
 
-            $employee = $conge->employee;
+        // 🔹 MET À JOUR LE SOLDE DE L'EMPLOYÉ
+        $employee->update(['solde_conge' => $newSolde]);
 
-            if ($employee->solde_conge < $conge->nombre) {
-                throw new \Exception('Solde insuffisant');
-            }
+        // 🔹 MET À JOUR LE CONGÉ
+        $conge->update([
+            'statut' => 'valide',
+            'commentaire_validation' => 'Validé par le service RH',
+            'solde_restant' => $newSolde
+        ]);
+    });
 
-            // 🔥 Décrément UNIQUE
-            $employee->decrement('solde_conge', $conge->nombre);
-
-            $conge->update([
-                'statut' => 'valide',
-                'commentaire_validation' => 'Validé par le service RH',
-                'solde_restant' => $employee->solde_conge
-            ]);
-        });
-
-        return back()->with('success', 'Congé validé avec succès.');
-    }
+    return back()->with('success', 'Congé validé avec succès.');
+}
 
     /**
      * Refuser un congé

@@ -1,174 +1,217 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connexion - RS</title>
-    <link rel="stylesheet" href="{{asset('css/welcome.css')}}">
+    <title>Connexion - IDEA RH</title>
+    <!-- Importation de Poppins pour un look pro -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #00d2ff;
+            --secondary-color: #3a7bd5;
+            --dark-bg: #050a18;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --text-main: #ffffff;
+            --text-dim: #b0b3b8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            overflow-x: hidden;
+        }
+
+        .hero {
+            width: 100%;
+            min-height: 100vh;
+            background: radial-gradient(circle at top right, #1e2a4a, var(--dark-bg));
+            padding: 20px 8%;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Navigation modernisée */
+        nav {
+            width: 100%;
+            padding: 20px 0;
+            display: flex;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .logo {
+            width: 120px;
+            filter: brightness(0) invert(1); /* Rend le logo blanc si l'image est noire */
+            transition: transform 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        /* Contenu principal */
+        .content {
+            margin-top: 8%;
+            max-width: 700px;
+            z-index: 2;
+        }
+
+        .content h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            line-height: 1.2;
+            color: var(--text-main);
+            margin-bottom: 20px;
+        }
+
+        /* Animation au lieu du Marquee */
+        .agency-name {
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            margin-bottom: 10px;
+            display: block;
+            font-weight: 600;
+            border-left: 3px solid var(--primary-color);
+            padding-left: 15px;
+        }
+
+        .content p {
+            margin-bottom: 40px;
+            color: var(--text-dim);
+            font-size: 1.1rem;
+            max-width: 500px;
+        }
+
+        /* Lien URL stylisé */
+        .site-link {
+            display: inline-block;
+            margin-bottom: 30px;
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 0.9rem;
+            opacity: 0.7;
+            transition: 0.3s;
+            border-bottom: 1px solid transparent;
+        }
+
+        .site-link:hover {
+            opacity: 1;
+            border-bottom: 1px solid var(--primary-color);
+        }
+
+        /* Bouton modernisé */
+        .btn {
+            background: linear-gradient(45deg, var(--secondary-color), var(--primary-color));
+            padding: 16px 45px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 20px rgba(0, 210, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn a {
+            text-decoration: none;
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            display: block;
+        }
+
+        .btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 210, 255, 0.4);
+        }
+
+        /* Image d'illustration avec effet flottant */
+        .feature-img {
+            width: 45%;
+            max-width: 550px;
+            position: absolute;
+            bottom: 10%;
+            right: 5%;
+            z-index: 1;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-30px); }
+        }
+
+        /* Animations d'entrée */
+        .anim {
+            opacity: 0;
+            transform: translateY(40px);
+            animation: fadeInUp 0.8s ease forwards;
+        }
+
+        .delay-1 { animation-delay: 0.2s; }
+        .delay-2 { animation-delay: 0.4s; }
+        .delay-3 { animation-delay: 0.6s; }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .feature-img { width: 40%; bottom: 15%; }
+            .content h1 { font-size: 2.5rem; }
+        }
+
+        @media (max-width: 768px) {
+            .feature-img { display: none; }
+            .content { text-align: center; margin: 20% auto; }
+            .hero { padding: 20px 5%; }
+            .agency-name { border-left: none; padding-left: 0; }
+        }
+    </style>
 </head>
-<style>
-    *{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:'Poppins', sans-serif;
-}
-
-.hero{
-    width:100%;
-    min-height:100vh;
-    /*background-color:#0d0b20;*/
-    background: linear-gradient(#051033ff,#3c4244ff, #303135ff );
-    background-position:center ;
-    background-size: cover;
-    padding: 10px 10%;
-    overflow: hidden;
-    position:relative;  
-
-}
-nav{
-    padding: 10px 0;
-    display: flex;
-}
-
-.logo{
-    width: 140px;
-    
-}
-
-
-.content{
-    margin-top:10%;
-    max-width:600px;
-}
-.content h1{
-    font-size:45px;
-    /*color:#b8860b;*/
-    color:#f1f2ff;
-}
-.content p{
-    margin:10px 0 30px;
-    color:#fff;
-    font-size:30px;
-    animation-delay:0.5s
-
-}
-
-.content p a{
-    margin:10px 0 30px;
-    /*color:#b8860b;*/
-    color:#040404;
-    font-size:20px;
-    /*margin-left:200px;*/
-    text-decoration:none;
-    animation-delay:1s
-
-}
-.content p a:hover{
-    color:#fff;
-    text-decoration:underline;
-}
-
-.btn{
-   /* background-image:linear-gradient(45deg, #b8860b, #c430d7);*/
-   background: #03032eff ;
-    font-size:14px;
-    border-radius: 30px;
-    border-top-right-radius:0;
-    transition:0.5s;
-}
-
-.btn a{
-    text-decoration:none;
-    display:inline-block;
-    color:#fff;
-
-}
-
-.btn a:hover{
-    color:#040404;
-    text-decoration:underline;
-}
-
-.content .btn{
-    padding:15px 80px;
-    font-size:16px; 
-    animation-delay:1.5s
-
-}
-
-.btn:hover{
-    border-top-right-radius:30px;
-}
-.feature-img {
-    width: 50%; /* Largeur par défaut */
-    max-width: 600px; /* Taille maximale */
-    height: auto; /* Conserver le ratio d'aspect */
-    position: absolute;
-    bottom: 20%; /* Ajustez la position en fonction du design */
-    right: 5%; /* Alignez l'image à droite */
-    transition: all 0.3s ease-in-out; /* Animation douce */
-}
-
-.feature-img.anim{
-    animation-delay:2s
-}
-@media (max-width: 570px) {
-    .feature-img {
-        display:none;
-    }
-}
-
-@media (max-width: 480px) {
-    .feature-img {
-        display:none;
-    }
-}
-.anim{
-    opacity:0;
-    transform:translateY(30px);
-    animation:moveup 0.5s linear forwards;
-}
-@keyframes moveup {
-    100%{
-        opacity: 1;
-        transform: translateY(0px);
-    }
-}
-</style>
 <body>
     <div class="hero">
-        <nav>
-            <img src="{{asset('img/Idea noir.png')}}" class="logo">
+        <nav class="anim">
         </nav>
 
         <div class="content">
-            <h1 class="anim">Bienvenue sur le portail de gestion des ressources humaines</h1>
+            <span class="agency-name anim delay-1">RAPIDE SERVICE MADAGASCAR</span>
+            <h1 class="anim delay-1">Optimisez votre GRH</h1>
+            <p class="anim delay-2">Accédez à votre espace collaborateur pour gérer vos congés, vos documents et vos performances en toute simplicité.</p>
+            
+            <a href="https://srapideservice.rf.gd/?i=1" class="site-link anim delay-2">Site rapide service</a>
             <br>
-            <marquee behavior="scroll" direction="left"><p class="anim">Impulse Digital Entreprise Agency - IDEA </p></marquee>
-
-                <b><a  href="https://e-ideagency.com" style="text-decoration:none; color:#040404"><h3>e-ideagency.com</h3></a></b> <br><br>  
-         
-           
-            <button class="btn anim">
-            @if (Route::has('login'))
-                @auth
-                    <a href="{{ url('/dashboard') }}" >Dashboard</a></li>
-                @else
-                    <a href="{{ route('login') }}">Connexion</a></li>
-                    
-                @endauth
-            @endif
-
+            
+            <div class="anim delay-3">
+                <button class="btn">
+                    @if (Route::has('login'))
+                        @auth
+                            <a href="{{ url('/dashboard') }}">Accéder au Dashboard</a>
+                        @else
+                            <a href="{{ route('login') }}">Se connecter au Portail</a>
+                        @endauth
+                    @endif
+                </button>
+            </div>
         </div>
 
-
-        <img src="{{ asset('img/service.png') }}" class="feature-img anim" alt="Image description">
-
-
+        <img src="{{ asset('img/service.png') }}" class="feature-img anim delay-3" alt="Illustration RH">
     </div>
-
-    
-    </script>
 </body>
 </html>

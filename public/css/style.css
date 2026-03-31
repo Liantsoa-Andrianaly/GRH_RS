@@ -359,3 +359,141 @@ a:hover{
         left: 50%;
     }
 }
+
+/* --- SECTION RESPONSIVE MODIFIÉE --- */
+
+@media (max-width: 870px) {
+    .container {
+        min-height: 800px;
+        height: 100vh;
+    }
+
+    .signin-signup {
+        width: 100%;
+        top: 95%; /* Ajusté pour laisser de la place au panel du haut */
+        left: 50%;
+        transform: translate(-50%, -100%);
+        transition: 1s 0.8s ease-in-out;
+    }
+
+    .container::before {
+        width: 1500px;
+        height: 1500px;
+        left: 50%;
+        bottom: 68%;
+        transform: translateX(-50%);
+        right: initial;
+        top: initial;
+        transition: 2s ease-in-out;
+    }
+
+    .panels-container {
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr 2fr 1fr;
+    }
+
+    .panel {
+        flex-direction: row;
+        justify-content: space-around;
+        align-items: center;
+        padding: 2.5rem 8%;
+        grid-column: 1 / 2;
+    }
+
+    .right-panel {
+        grid-row: 3 / 4;
+    }
+
+    .left-panel {
+        grid-row: 1 / 2;
+    }
+
+    .panel .content {
+        margin: 0; /* Suppression du margin-right négatif qui cassait le centrage */
+        padding-right: 0;
+        transition: 0.9s 0.8s ease-in-out;
+    }
+
+    .panel h3 {
+        margin-left: 0; /* Suppression du décalage forcé */
+        font-size: 1.2rem;
+    }
+
+    .panel p {
+        font-size: 0.9rem;
+    }
+
+    .btn.transparent {
+        width: 150px;
+        height: 38px;
+        font-size: 0.7rem;
+        margin-left: 15px; /* Petit espace entre texte et bouton */
+    }
+
+    .image {
+        width: 200px;
+        padding: 0; /* Réduction du padding pour gagner de la place */
+        transition: 0.9s 0.6s ease-in-out;
+    }
+
+    /* Ajustement des translations en mode mobile */
+    .right-panel .content, 
+    .right-panel .image {
+        transform: translateY(300px); /* Changement de X vers Y pour le flux vertical */
+    }
+
+    .container.sign-up-mode:before {
+        transform: translate(-50%, 100%);
+        bottom: 32%;
+        right: initial;
+    }
+
+    .container.sign-up-mode .left-panel .image,
+    .container.sign-up-mode .left-panel .content {
+        transform: translateY(-300px);
+    }
+
+    .container.sign-up-mode .signin-signup {
+        top: 5%;
+        transform: translate(-50%, 0);
+        left: 50%;
+    }
+}
+
+@media (max-width: 570px) {
+    form {
+        padding: 0 1.5rem;
+    }
+
+    .image {
+        display: none; /* Cache l'image sur les très petits écrans pour éviter le chevauchement */
+    }
+
+    .panel .content {
+        padding: 0.5rem 1rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .panel h3 {
+        margin: 10px 0;
+    }
+
+    .btn.transparent {
+        margin-left: 0;
+    }
+
+    .title {
+        font-size: 1.8rem;
+    }
+
+    .container:before {
+        bottom: 75%;
+    }
+
+    .container.sign-up-mode:before {
+        bottom: 25%;
+    }
+}

@@ -30,11 +30,11 @@
                     </div>
 
                     <input type="submit" value="Se connecter" class="btn solid">
-                    <div class="social-media">
+                    <!-- <div class="social-media">
                         @if (Route::has('password.request'))
                             <a href="{{ route('password.request') }}">Mot de passe oublié?</a>
                         @endif
-                    </div>
+                    </div> -->
                 </form>
 
                 <form method="POST" action="{{ route('register') }}" class="sign-up-form">

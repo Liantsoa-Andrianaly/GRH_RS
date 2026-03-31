@@ -34,8 +34,8 @@ class EmployeeController extends Controller
             'nationalite'        => 'nullable|string|max:100',
             'solde_conge'        => 'nullable|integer|min:0',
             'status'             => 'nullable|in:actif,demissionnaire,licencie,fin_cdd',
+            'date_naissance'     => 'nullable|date',
             'date_embauche'      => 'nullable|date',
-            'photo'              => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'salaire_base'       => 'required|integer|min:0',
 
             
@@ -74,7 +74,8 @@ public function dashboard()
     $inactifs = Employee::whereIn('status', ['demissionnaire','licencie','fin_cdd'])->count();
 
 
-    $totalSupprimes = EmployeBackup::count();
+    // $totalSupprimes = EmployeBackup::count();
+    $totalSupprimes = Employee::onlyTrashed()->count();
 
     // Répartition par service
     $employeesByService = Employee::with('poste.service')
@@ -104,11 +105,11 @@ public function dashboard()
     /**
      * Liste des employés avec pagination
      */
-    public function index()
+   public function index()
     {
-        $employees = Employee::with('poste.service', 'agence')
-                             ->paginate(5)
-                             ->withQueryString();
+        $employees = Employee::with(['poste.service', 'agence'])
+            ->orderBy('nom', 'asc')
+            ->paginate(10);
 
         return view('employees.index', compact('employees'));
     }
@@ -139,114 +140,89 @@ public function dashboard()
     /**
      * Ajouter un employé
      */
-   public function store(Request $request)
-    {
-        $request->validate($this->validationRules());
+public function store(Request $request)
+{
+    $request->validate($this->validationRules());
 
-        return DB::transaction(function () use ($request) {
+    return DB::transaction(function () use ($request) {
 
-            $data = $request->except('photo');
+        $data = $request->only([
+            'nom', 'prenom', 'sexe', 'statut_matrimonial',
+            'email', 'telephone', 'adresse', 'diplome',
+            'poste_id', 'agence_id', 'cin', 'permis_de_conduire',
+            'nationalite', 'status', 'date_embauche',
+            'date_naissance', 'lieu_naissance',
+            'salaire_base', 'solde_conge',
+        ]);
 
-            //  Matricule sécurisé
-            $data['matricule'] = $this->generateMatricule();
+        $data['matricule'] = $this->generateMatricule();
+        $data['solde_conge'] = $data['solde_conge'] ?? 0;
 
-            if ($request->hasFile('photo')) {
-                $data['photo'] = $request->file('photo')->store('photos', 'public');
-            }
+        Employee::create($data);
 
-            $data['solde_conge'] = $data['solde_conge'] ?? 0;
-
-            Employee::create($data);
-
-            return redirect()->route('employees.index')
-                ->with('success', 'Employé ajouté avec succès.');
-        });
-    }
-
+        return redirect()->route('employees.index')
+            ->with('success', 'Employé ajouté avec succès.');
+    });
+}
 
     /**
      * Mettre à jour un employé
      */
-    public function update(Request $request, Employee $employee)
-    {
-        $request->validate($this->validationRules());
+public function update(Request $request, Employee $employee)
+{
+    $request->validate($this->validationRules());
 
-        $data = $request->except('photo');
+    return DB::transaction(function () use ($request, $employee) {
 
-        // 🔒 Interdire la modification du matricule
-        unset($data['matricule']);
+        $data = $request->only([
+            'nom', 'prenom', 'sexe', 'statut_matrimonial',
+            'email', 'telephone', 'adresse', 'diplome',
+            'poste_id', 'agence_id', 'cin', 'permis_de_conduire',
+            'nationalite', 'status', 'date_embauche',
+            'date_naissance', 'lieu_naissance',
+            'salaire_base', 'solde_conge',
+        ]);
 
-        if ($request->hasFile('photo')) {
-            if ($employee->photo && Storage::disk('public')->exists($employee->photo)) {
-                Storage::disk('public')->delete($employee->photo);
-            }
-            $data['photo'] = $request->file('photo')->store('photos', 'public');
-        }
+        $data['solde_conge'] = $data['solde_conge'] ?? 0;
 
         $employee->update($data);
 
-        return redirect()->route('employees.index')
-                        ->with('success', 'Employé mis à jour avec succès.');
-    }
+        return redirect()->route('employees.show', $employee->id)
+            ->with('success', 'Employé mis à jour avec succès.');
+    });
+}
 
 
     /**
      * Supprimer un employé et sauvegarder dans backup
      */
-    public function destroy(Employee $employee)
-    {
-        EmployeBackup::create($employee->toArray() + [
-            'deleted_at' => now(), // date exacte de suppression UTC
-        ]);
-
-        $employee->delete(); 
-
-        return redirect()->route('employees.index')
-                         ->with('success', 'Employé supprimé et sauvegardé.');
-    }
-
-    /**
-     * Liste des backups
-     */
-    public function liste_backup()
-    {
-        $backups = EmployeBackup::latest()->paginate(10);
-
-        $backups->transform(function ($backup) {
-        $backup->deleted_at_local = $backup->deleted_at
-            ? Carbon::parse($backup->deleted_at)
-                    ->timezone(config('app.timezone'))
-                    ->format('d/m/Y')
-            : 'Non défini';
-        return $backup;
-    });
 
 
-        return view('employees.backup', compact('backups'));
-    }
+public function destroy(Employee $employee)
+{
+    $employee->delete(); // Soft delete → remplit deleted_at
+    return redirect()->route('employees.index')
+                     ->with('success', 'Employé supprimé avec succès.');
+}
+/**
+ * Liste des backups
+ */
+public function liste_backup()
+{
+    $backups = Employee::onlyTrashed()->latest()->paginate(10);
+
+    return view('employees.backup', compact('backups'));
+}
 
     
     public function show(Employee $employee)
-    {
-        $employee->load([
-            'poste.service',
-            'agence',
-            'conges' => function ($query) {
-                $query->where('statut', 'valide')
-                      ->orderBy('date_debut', 'desc');
-            }
-        ]);
+{
+    $employee->load(['poste.service', 'agence', 'conges' => function ($query) {
+        $query->where('statut', 'valide')->orderBy('date_debut', 'desc');
+    }]);
 
-      
-        $employee->solde_conge_restant = $employee->solde_conge;
-
-        if ($employee->solde_conge_restant < 0) {
-            $employee->solde_conge_restant = 0; 
-        }
-
-
-        return view('employees.show', compact('employee'));
-    }
+    return view('employees.show', compact('employee'));
+}
 
     
 
